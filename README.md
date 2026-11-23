@@ -28,20 +28,20 @@ Synthetic data with a known effect; every implementation returns the same estima
 
 | Estimator | n | Rust (public API) | Rust (core only) | numpy `lstsq` | statsmodels / linearmodels |
 | --- | --- | --- | --- | --- | --- |
-| OLS | 100k | 8.8 ms | 3.9 ms | 1.3 ms | 6.1 ms |
-| OLS | 10M | 1,340 ms | 647 ms | 314 ms | 994 ms |
-| IV/2SLS | 100k | 7.1 ms | 2.9 ms | 2.1 ms | 110 ms |
-| IV/2SLS | 10M | 1,370 ms | 702 ms | 530 ms | 11,730 ms |
-| DiD | 100k | 9.5 ms | 3.3 ms | 1.8 ms | 6.5 ms |
-| DiD | 10M | 1,496 ms | 913 ms | 461 ms | 1,190 ms |
+| OLS | 100k | 8.0 ms | 3.7 ms | 1.3 ms | 6.1 ms |
+| OLS | 10M | 1,290 ms | 593 ms | 313 ms | 986 ms |
+| IV/2SLS | 100k | 6.7 ms | 2.7 ms | 2.1 ms | 116 ms |
+| IV/2SLS | 10M | 1,309 ms | 677 ms | 514 ms | 11,997 ms |
+| DiD | 100k | 6.6 ms | 3.1 ms | 1.8 ms | 6.6 ms |
+| DiD | 10M | 1,488 ms | 800 ms | 445 ms | 1,179 ms |
 
 Full table at 10k, 100k, 1M and 10M rows: [`benchmarks/results/results.md`](benchmarks/results/results.md).
 
-- **The Rust path is slower than numpy**: 2.2–6.7× through the public API and 1.3–2.9× even when the Polars-to-list conversion is excluded (one exception: IV at 1M rows, 0.8×).
+- **The Rust path is slower than numpy**: 2.0–6.0× through the public API and 1.2–2.8× even when the Polars-to-list conversion is excluded (one exception: IV at 1M rows, 0.8×).
 - The cost is data movement, not arithmetic: the wrapper converts the DataFrame to Python lists and Rust copies each list into a `Vec<f64>`. Reading numpy buffers zero-copy (the `numpy` crate) is the obvious next step.
 - statsmodels and linearmodels do more work (standard errors, diagnostics), so their times are not like-for-like with the Rust point estimates. linearmodels' IV is 9–18× slower than Rust here for that reason.
 
-Hardware and versions: Intel Core Ultra 9 285H (10 CPUs available), Fedora Linux, Python 3.13.12, rustc 1.91.1, numpy 2.5.5 (OpenBLAS), polars 2.1.0, statsmodels 0.15.0, linearmodels 7.1, Rust extension built with `maturin develop --release`.
+Hardware and versions: Intel Core Ultra 9 285H (10 CPUs available), Fedora Linux, Python 3.14.10, rustc 1.91.1, numpy 2.5.5 (OpenBLAS), polars 2.1.0, statsmodels 0.15.0, linearmodels 7.1, Rust extension built with `maturin develop --release`.
 
 ## Usage
 
@@ -59,7 +59,7 @@ All columns must be numeric (Float64). Each function returns a float; no standar
 
 ## Setup
 
-Requires Python 3.12+ and a Rust toolchain.
+Requires Python 3.12+ (the project defaults to 3.14) and a Rust toolchain.
 
 ```bash
 uv sync                                  # installs dependencies and builds the extension

@@ -2,25 +2,25 @@
 
 | Implementation | n=10,000 | n=100,000 | n=1,000,000 | n=10,000,000 |
 | --- | --- | --- | --- | --- |
-| rust_wrapper | 0.55 ms | 8.83 ms | 120.83 ms | 1,340.39 ms |
-| rust_core | 0.27 ms | 3.87 ms | 59.05 ms | 646.84 ms |
-| numpy | 0.13 ms | 1.32 ms | 25.84 ms | 314.16 ms |
-| statsmodels | 0.69 ms | 6.10 ms | 109.04 ms | 993.66 ms |
+| rust_wrapper | 0.56 ms | 7.95 ms | 108.44 ms | 1,289.52 ms |
+| rust_core | 0.25 ms | 3.68 ms | 53.67 ms | 592.59 ms |
+| numpy | 0.15 ms | 1.32 ms | 25.39 ms | 313.04 ms |
+| statsmodels | 0.73 ms | 6.06 ms | 103.29 ms | 986.48 ms |
 
 ### IV/2SLS
 
 | Implementation | n=10,000 | n=100,000 | n=1,000,000 | n=10,000,000 |
 | --- | --- | --- | --- | --- |
-| rust_wrapper | 0.55 ms | 7.14 ms | 119.10 ms | 1,369.76 ms |
-| rust_core | 0.27 ms | 2.89 ms | 44.57 ms | 701.71 ms |
-| numpy | 0.22 ms | 2.05 ms | 54.43 ms | 530.28 ms |
-| linearmodels | 9.80 ms | 109.80 ms | 1,079.29 ms | 11,730.32 ms |
+| rust_wrapper | 0.56 ms | 6.70 ms | 107.87 ms | 1,308.61 ms |
+| rust_core | 0.26 ms | 2.68 ms | 41.71 ms | 676.82 ms |
+| numpy | 0.22 ms | 2.09 ms | 53.73 ms | 514.12 ms |
+| linearmodels | 10.28 ms | 116.01 ms | 1,054.66 ms | 11,997.31 ms |
 
 ### DiD
 
 | Implementation | n=10,000 | n=100,000 | n=1,000,000 | n=10,000,000 |
 | --- | --- | --- | --- | --- |
-| rust_wrapper | 0.57 ms | 9.47 ms | 129.64 ms | 1,495.60 ms |
-| rust_core | 0.30 ms | 3.33 ms | 73.60 ms | 912.81 ms |
-| numpy | 0.18 ms | 1.78 ms | 48.45 ms | 460.56 ms |
-| statsmodels | 0.69 ms | 6.48 ms | 127.69 ms | 1,190.19 ms |
+| rust_wrapper | 0.53 ms | 6.58 ms | 116.01 ms | 1,487.63 ms |
+| rust_core | 0.27 ms | 3.12 ms | 70.63 ms | 799.96 ms |
+| numpy | 0.18 ms | 1.79 ms | 47.78 ms | 445.35 ms |
+| statsmodels | 0.73 ms | 6.63 ms | 123.78 ms | 1,179.17 ms |
