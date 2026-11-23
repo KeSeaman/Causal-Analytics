@@ -5,8 +5,8 @@ build-backend = "maturin"
 [project]
 name = "causal_rust_core"
 version = "0.1.0"
-description = "High-performance Causal Inference in Rust/Python"
-authors = [{name = "Antigravity", email = "antigravity@deepmind.com"}]
+description = "Causal inference estimators in Rust with Python bindings"
+authors = [{name = "Kinyua Seaman"}]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

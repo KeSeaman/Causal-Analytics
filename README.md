@@ -1,14 +1,13 @@
-# Causal Rust Core: High-Performance Causal Inference
+# Causal Rust Core: Causal Inference in Rust + Python
 
-A production-ready Causal Inference library with a polyglot architecture combining Rust's performance with Python's data science ecosystem. Implements OLS, IV/2SLS, Difference-in-Differences, and advanced ML-based causal methods.
+A learning project that implements core causal estimators (OLS, IV/2SLS, Difference-in-Differences) in Rust, exposes them to Python through PyO3, and compares them with ML-based estimators from EconML on the NBER NSW job-training data.
 
 ## 🔬 Overview
 
-This project demonstrates high-performance causal inference, featuring:
-- **Multi-Method Support**: OLS, IV/2SLS, DiD, and Causal Forests
-- **Rust Backend**: PyO3 bindings for ~10x performance gains
-- **EconML Integration**: GPU-accelerated treatment effect estimation
-- **Interactive Dashboard**: Marimo notebooks for analysis and visualization
+- **Rust estimators** (~160 lines, `linfa-linear`): OLS, IV/2SLS (two-stage OLS) and 2×2 DiD (OLS with a group × time interaction). They return point estimates only; no standard errors yet.
+- **EconML** for causal forests and other heterogeneous-effect estimators (these run in Python, not Rust).
+- **Marimo notebooks** for the NBER NSW and IHDP analyses.
+- **Performance**: no speed claim is made. A like-for-like benchmark against numpy and statsmodels is in progress; results will be reported here with hardware and versions.
 
 ## 🏗️ Architecture
 
@@ -79,7 +78,7 @@ marimo edit notebook.py
 
 ### Rust Backend (`src/`)
 
-High-performance implementations of causal estimators:
+Estimators implemented in Rust:
 
 ```rust
 /// Ordinary Least Squares regression
@@ -114,7 +113,7 @@ print(f"Treatment Effect: {iv_result.treatment_effect}")
 
 ### EconML Integration
 
-GPU-accelerated causal forests for heterogeneous effects:
+Causal forests for heterogeneous effects (pure EconML, CPU):
 
 ```python
 from econml.dml import CausalForestDML
