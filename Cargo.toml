@@ -11,7 +11,9 @@ name = "_causal_rust_core"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.30", features = ["extension-module", "abi3-py312"] }
+pyo3 = { version = "0.30", features = ["abi3-py312"] }
+numpy = "0.30"
+rayon = "1.10"
 linfa = "0.7"
 linfa-linear = "0.7"
 ndarray = "0.15"
