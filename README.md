@@ -1,207 +1,98 @@
 # Causal Rust Core: Causal Inference in Rust + Python
 
-A learning project that implements core causal estimators (OLS, IV/2SLS, Difference-in-Differences) in Rust, exposes them to Python through PyO3, and compares them with ML-based estimators from EconML on the NBER NSW job-training data.
+A learning project that implements core causal estimators (OLS, IV/2SLS, 2×2 difference-in-differences) in Rust, exposes them to Python with PyO3, and checks them against standard Python estimators on the NSW job-training experiment.
 
-## 🔬 Overview
+- **Rust estimators** (~160 lines, `linfa-linear`): OLS, IV/2SLS (two-stage OLS) and DiD (OLS with a group × time interaction). They return point estimates only, with no standard errors.
+- **Python layer** (`causal_lib/`): difference in means, OLS, inverse probability weighting, an EconML causal forest, and a Baron–Kenny mediation helper.
+- **Benchmark** (`benchmarks/`): Rust against numpy, statsmodels and linearmodels from 10k to 10M rows.
 
-- **Rust estimators** (~160 lines, `linfa-linear`): OLS, IV/2SLS (two-stage OLS) and 2×2 DiD (OLS with a group × time interaction). They return point estimates only; no standard errors yet.
-- **EconML** for causal forests and other heterogeneous-effect estimators (these run in Python, not Rust).
-- **Marimo notebooks** for the NBER NSW and IHDP analyses.
-- **Performance**: no speed claim is made. A like-for-like benchmark against numpy and statsmodels is in progress; results will be reported here with hardware and versions.
+## Results: NSW job-training experiment
 
-## 🏗️ Architecture
+Dehejia–Wahba NSW experimental sample: 722 men (297 treated), outcome 1978 earnings. Reproduce with `python scripts/reproduce_nsw.py`, which downloads the data from NBER and writes `results/nsw_results.json`.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                   Causal Inference Stack                        │
-├─────────────────────────────────────────────────────────────────┤
-│  Frontend    │ Marimo Notebooks (interactive analysis)         │
-├──────────────┼──────────────────────────────────────────────────┤
-│  ML Layer    │ EconML (Causal Forests), scikit-learn            │
-├──────────────┼──────────────────────────────────────────────────┤
-│  Data        │ Polars DataFrames, NumPy arrays                  │
-├──────────────┼──────────────────────────────────────────────────┤
-│  Backend     │ Rust Core (PyO3, matrix ops, estimators)         │
-└─────────────────────────────────────────────────────────────────┘
-```
+| Estimator | Effect on 1978 earnings |
+| --- | --- |
+| Difference in means | $886 (bootstrap 95% CI −$79 to $1,932) |
+| OLS with covariates (scikit-learn) | $807 |
+| OLS with covariates (Rust) | $807 (identical to 10 significant figures) |
+| Inverse probability weighting | $799 |
+| Causal forest (EconML `CausalForestDML`) | $811 |
 
-## 📁 Project Structure
+- Because treatment was randomised, the difference in means is unbiased; adjusting for covariates moves the estimate by under 10%, which is what a working randomisation should look like.
+- The interval is wide: with 722 people the data are consistent with no effect at all. The point estimates agree; the precision does not support a strong claim.
+- **Placebo check**: the mediation helper with 1975 earnings as the "mediator" gives an indirect effect of −$3. Since 1975 earnings were recorded before the programme, the true indirect effect is zero by design; the near-zero result is a sanity check, not a finding about mechanisms.
 
-```
-causal_project_v2/
-├── src/                        # Rust backend
-│   ├── lib.rs                  # PyO3 module exports
-│   ├── foundational_methods.rs # OLS, IV/2SLS implementations
-│   ├── longitudinal_methods.rs # DiD implementations
-│   ├── structural_methods.rs   # Structural equation methods
-│   └── error.rs                # Error handling
-├── causal_lib/                 # Python interface
-│   ├── causal.py               # Main CausalEstimator class
-│   ├── foundational.py         # Python OLS/IV wrappers
-│   ├── data_loader.py          # NBER dataset loader
-│   ├── data_loader_ihdp.py     # IHDP dataset loader
-│   └── visualization.py        # Plotting utilities
-├── python/
-│   └── causal_rust_core/       # PyO3 Python bindings
-├── tests/                      # Test suite
-├── notebook.py                 # NBER analysis notebook
-└── notebook_ihdp.py            # IHDP analysis notebook
-```
+## Benchmark: Rust against numpy, statsmodels and linearmodels
 
-## 🚀 Quick Start
+Synthetic data with a known effect; every implementation returns the same estimate (largest disagreement 1e-11). Median wall time, `python benchmarks/bench_estimators.py`:
 
-### Prerequisites
-- Python 3.12
-- Rust toolchain (for backend compilation)
-- uv package manager
+| Estimator | n | Rust (public API) | Rust (core only) | numpy `lstsq` | statsmodels / linearmodels |
+| --- | --- | --- | --- | --- | --- |
+| OLS | 100k | 8.8 ms | 3.9 ms | 1.3 ms | 6.1 ms |
+| OLS | 10M | 1,340 ms | 647 ms | 314 ms | 994 ms |
+| IV/2SLS | 100k | 7.1 ms | 2.9 ms | 2.1 ms | 110 ms |
+| IV/2SLS | 10M | 1,370 ms | 702 ms | 530 ms | 11,730 ms |
+| DiD | 100k | 9.5 ms | 3.3 ms | 1.8 ms | 6.5 ms |
+| DiD | 10M | 1,496 ms | 913 ms | 461 ms | 1,190 ms |
 
-### 1. Create Environment & Install Dependencies
+Full table at 10k, 100k, 1M and 10M rows: [`benchmarks/results/results.md`](benchmarks/results/results.md).
 
-```bash
-uv sync
-```
+- **The Rust path is slower than numpy**: 2.2–6.7× through the public API and 1.3–2.9× even when the Polars-to-list conversion is excluded (one exception: IV at 1M rows, 0.8×).
+- The cost is data movement, not arithmetic: the wrapper converts the DataFrame to Python lists and Rust copies each list into a `Vec<f64>`. Reading numpy buffers zero-copy (the `numpy` crate) is the obvious next step.
+- statsmodels and linearmodels do more work (standard errors, diagnostics), so their times are not like-for-like with the Rust point estimates. linearmodels' IV is 9–18× slower than Rust here for that reason.
 
-### 2. Build Rust Backend
+Hardware and versions: Intel Core Ultra 9 285H (10 CPUs available), Fedora Linux, Python 3.13.12, rustc 1.91.1, numpy 2.5.5 (OpenBLAS), polars 2.1.0, statsmodels 0.15.0, linearmodels 7.1, Rust extension built with `maturin develop --release`.
 
-```bash
-source .venv/bin/activate
-maturin develop
-```
-
-### 3. Run Analysis Notebook
-
-```bash
-marimo edit notebook.py
-```
-
-## 🔧 Key Components
-
-### Rust Backend (`src/`)
-
-Estimators implemented in Rust:
-
-```rust
-/// Ordinary Least Squares regression
-pub fn ols(y: Vec<f64>, x: Vec<Vec<f64>>) -> OLSResult
-
-/// Instrumental Variable / Two-Stage Least Squares
-pub fn iv_2sls(y: Vec<f64>, x: Vec<Vec<f64>>, z: Vec<Vec<f64>>) -> IVResult
-
-/// Difference-in-Differences estimator
-pub fn did(before_control: f64, after_control: f64, 
-           before_treat: f64, after_treat: f64) -> f64
-```
-
-### Python Interface (`causal_lib/`)
-
-Clean Python API wrapping Rust core:
+## Usage
 
 ```python
-from causal_lib import CausalEstimator
+import polars as pl
+import causal_rust_core as crc
 
-estimator = CausalEstimator()
-
-# OLS regression
-result = estimator.ols(y, X)
-print(f"Coefficients: {result.coefficients}")
-print(f"R-squared: {result.r_squared}")
-
-# IV/2SLS estimation
-iv_result = estimator.iv_2sls(y, X, Z)
-print(f"Treatment Effect: {iv_result.treatment_effect}")
+df = pl.read_csv("data.csv")
+crc.ols_fit(df, "outcome", ["treatment", "age"])   # coefficient on the first feature
+crc.iv_fit(df, "outcome", "treatment", "instrument")
+crc.did_fit(df, "outcome", "group", "time")          # coefficient on group × time
 ```
 
-### EconML Integration
+All columns must be numeric (Float64). Each function returns a float; no standard errors.
 
-Causal forests for heterogeneous effects (pure EconML, CPU):
+## Setup
 
-```python
-from econml.dml import CausalForestDML
-
-model = CausalForestDML(n_trees=200)
-model.fit(Y, T, X=X, W=W)
-treatment_effects = model.effect(X_test)
-```
-
-## 📊 Supported Methods
-
-| Method | Description | Use Case |
-|--------|-------------|----------|
-| **OLS** | Ordinary Least Squares | Baseline regression |
-| **IV/2SLS** | Instrumental Variables | Endogeneity correction |
-| **DiD** | Difference-in-Differences | Policy evaluation |
-| **Causal Forest** | ML-based heterogeneous effects | Individual treatment effects |
-
-## 📊 Results
-
-Results from running the analysis on the **NBER NSW (National Supported Work)** dataset with 722 observations. This classic dataset evaluates a job training program's effect on earnings.
-
-### Foundational Estimates
-
-| Method | Estimate | Description |
-|--------|----------|-------------|
-| **Neyman (Diff-in-Means)** | $886.30 | Simple difference between treated and control group means. The most straightforward estimator—compares average earnings of those who received training vs. those who didn't. |
-| **MLE (OLS)** | $806.51 | Ordinary Least Squares regression controlling for age, education, race, marital status, and prior earnings (re75). Adjusts for observable confounders to reduce bias. |
-| **Rubin (IPW)** | $799.45 | Inverse Probability Weighting using propensity scores. Reweights observations to balance treated/control groups on covariates, mimicking a randomized experiment. |
-
-### Interpretation
-
-- **Treatment Effect**: The job training program increased annual earnings by approximately **$800-886**
-- **Method Agreement**: All three estimators produce consistent results (~$800-890), suggesting robust findings
-- **Bias Correction**: OLS and IPW yield lower estimates than Neyman, indicating some positive selection into treatment
-- **Practical Significance**: An ~$800 increase in annual earnings represents meaningful economic impact for the target population
-
-### Advanced ML-Based Estimates
-
-| Method | Estimate | Description |
-|--------|----------|-------------|
-| **Causal Forest** | $827.26 | ML-based heterogeneous treatment effect estimator (EconML). Uses Random Forests to model outcome and treatment, allowing for individual-level treatment effects. The ATE represents the average across all individuals. |
-| **Mediation Total Effect** | $831.04 | Total causal effect decomposed into direct and indirect pathways through a mediator (prior earnings re75). |
-| **Mediation ADE (Direct)** | $834.41 | Average Direct Effect—the portion of treatment effect NOT mediated through re75. Shows the direct impact of training on earnings. |
-| **Mediation ACME (Indirect)** | -$3.37 | Average Causal Mediation Effect—the portion of effect flowing through the mediator (re75). The small negative value suggests minimal mediation through prior earnings. |
-
-### Key Insights
-
-- **Consistency Across Methods**: All methods (Neyman, OLS, IPW, Causal Forest) estimate treatment effects in the **$800-890 range**
-- **Direct vs. Indirect Effects**: Nearly all of the treatment effect is direct ($834), with negligible effect through prior earnings
-- **Heterogeneity**: Causal Forest enables exploring treatment effect heterogeneity across subgroups
-
-## 🛠️ Development
-
-### Rebuild Backend After Changes
-
-When modifying Rust files in `src/`, recompile:
+Requires Python 3.12+ and a Rust toolchain.
 
 ```bash
-maturin develop
+uv sync                                  # installs dependencies and builds the extension
+uv run maturin develop --release         # optimised build (use before benchmarking)
+uv run pytest                            # estimator recovery tests on synthetic data
+uv run python scripts/reproduce_nsw.py   # NSW results
+uv run python benchmarks/bench_estimators.py --sizes 10000 100000 1000000 10000000
+uv run marimo edit notebook.py           # IHDP notebook (needs ihdp.csv with treatment, y_factual, x1..x25)
 ```
 
-For release builds with optimizations:
+## Project structure
 
-```bash
-maturin develop --release
+```text
+src/                       Rust: OLS (foundational_methods.rs), IV (structural_methods.rs), DiD (longitudinal_methods.rs)
+python/causal_rust_core/   Python wrapper: Polars DataFrame -> Rust
+causal_lib/                Python estimators, data loaders (NSW, IHDP), plotting
+scripts/reproduce_nsw.py   Regenerates the NSW results table
+benchmarks/                Benchmark script and results
+tests/                     Recovery tests (OLS, IV, DiD) on synthetic data with known effects
+notebook.py                Marimo notebook for IHDP
 ```
 
-### Run Tests
+## Limitations
 
-```bash
-pytest tests/
-```
+- Point estimates only: no standard errors, clustering or weak-instrument diagnostics in the Rust layer.
+- IV supports one instrument and no exogenous controls; DiD is the 2×2 case only.
+- The causal forest runs entirely in EconML; nothing about it is accelerated by the Rust layer.
 
-### Verify Rust Import
-
-```python
-from causal_rust_core import ols, iv_2sls, did
-print(ols([1.0, 2.0], [[1.0], [2.0]]))
-```
-
-## 📝 License
+## License
 
 MIT
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-- [EconML](https://github.com/microsoft/EconML) - Heterogeneous treatment effects
-- [PyO3](https://pyo3.rs/) - Rust-Python bindings
-- [Polars](https://pola.rs/) - Fast DataFrames
-- [Marimo](https://marimo.io/) - Reactive notebooks
+- Dehejia & Wahba NSW data, hosted by NBER
+- [EconML](https://github.com/microsoft/EconML), [PyO3](https://pyo3.rs/), [linfa](https://github.com/rust-ml/linfa), [Polars](https://pola.rs/), [Marimo](https://marimo.io/)

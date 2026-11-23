@@ -1,0 +1,451 @@
+{
+  "environment": {
+    "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+    "cpus_available": 10,
+    "os": "Linux-7.3.4-200.fc44.x86_64-x86_64-with-glibc2.43",
+    "python": "3.13.12",
+    "rustc": "rustc 1.91.1 (ed61e7d7e 2025-11-07)",
+    "packages": {
+      "numpy": "2.5.5",
+      "polars": "2.1.0",
+      "statsmodels": "0.15.0",
+      "linearmodels": "7.1",
+      "causal_rust_core": "0.1.0"
+    },
+    "rust_build": "maturin develop --release"
+  },
+  "rows": [
+    {
+      "estimator": "OLS",
+      "implementation": "rust_wrapper",
+      "n": 10000,
+      "median_s": 0.0005497414999808825,
+      "min_s": 0.0005450829994515516,
+      "repeats": 50,
+      "estimate": 2.0124146486041634
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "rust_core",
+      "n": 10000,
+      "median_s": 0.0002739945002758759,
+      "min_s": 0.00027319999935571104,
+      "repeats": 50,
+      "estimate": 2.0124146486041634
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "numpy",
+      "n": 10000,
+      "median_s": 0.0001349865001429862,
+      "min_s": 0.00013456999931804603,
+      "repeats": 50,
+      "estimate": 2.0124146486041643
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "statsmodels",
+      "n": 10000,
+      "median_s": 0.0006939670001884224,
+      "min_s": 0.000665775999550533,
+      "repeats": 50,
+      "estimate": 2.0124146486041643
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "rust_wrapper",
+      "n": 10000,
+      "median_s": 0.00054719949957871,
+      "min_s": 0.0005444090002129087,
+      "repeats": 50,
+      "estimate": 2.0781221380087933
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "rust_core",
+      "n": 10000,
+      "median_s": 0.0002731849999690894,
+      "min_s": 0.0002721350001593237,
+      "repeats": 50,
+      "estimate": 2.0781221380087933
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "numpy",
+      "n": 10000,
+      "median_s": 0.0002173580000999209,
+      "min_s": 0.00021653000021615298,
+      "repeats": 50,
+      "estimate": 2.0781221380088235
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "linearmodels",
+      "n": 10000,
+      "median_s": 0.009801182000046538,
+      "min_s": 0.00965560100030416,
+      "repeats": 50,
+      "estimate": 2.078122138008844
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "rust_wrapper",
+      "n": 10000,
+      "median_s": 0.0005687135003427102,
+      "min_s": 0.000565418999940448,
+      "repeats": 50,
+      "estimate": 3.039161701594338
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "rust_core",
+      "n": 10000,
+      "median_s": 0.0002965949997815187,
+      "min_s": 0.00029386299956968287,
+      "repeats": 50,
+      "estimate": 3.039161701594338
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "numpy",
+      "n": 10000,
+      "median_s": 0.0001760484997248568,
+      "min_s": 0.00017545299942867132,
+      "repeats": 50,
+      "estimate": 3.0391617015943337
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "statsmodels",
+      "n": 10000,
+      "median_s": 0.0006945744999029557,
+      "min_s": 0.0006859620007162448,
+      "repeats": 50,
+      "estimate": 3.0391617015943364
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "rust_wrapper",
+      "n": 100000,
+      "median_s": 0.008825066000099469,
+      "min_s": 0.008167947999936587,
+      "repeats": 50,
+      "estimate": 1.9907748327543504
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "rust_core",
+      "n": 100000,
+      "median_s": 0.003869033000228228,
+      "min_s": 0.0037609840001096018,
+      "repeats": 50,
+      "estimate": 1.9907748327543504
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "numpy",
+      "n": 100000,
+      "median_s": 0.0013156890004211164,
+      "min_s": 0.0013079220007057302,
+      "repeats": 50,
+      "estimate": 1.9907748327543568
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "statsmodels",
+      "n": 100000,
+      "median_s": 0.0060966869996263995,
+      "min_s": 0.006004967999615474,
+      "repeats": 50,
+      "estimate": 1.9907748327543575
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "rust_wrapper",
+      "n": 100000,
+      "median_s": 0.007144918000449252,
+      "min_s": 0.006744964000063192,
+      "repeats": 50,
+      "estimate": 2.000042897370411
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "rust_core",
+      "n": 100000,
+      "median_s": 0.002891224500217504,
+      "min_s": 0.0028035000004820176,
+      "repeats": 50,
+      "estimate": 2.000042897370411
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "numpy",
+      "n": 100000,
+      "median_s": 0.002045237000402267,
+      "min_s": 0.0020359000000098604,
+      "repeats": 50,
+      "estimate": 2.00004289737056
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "linearmodels",
+      "n": 100000,
+      "median_s": 0.10979532749979626,
+      "min_s": 0.10620339500019327,
+      "repeats": 18,
+      "estimate": 2.0000428973705575
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "rust_wrapper",
+      "n": 100000,
+      "median_s": 0.009470002499710972,
+      "min_s": 0.009186377999867545,
+      "repeats": 50,
+      "estimate": 3.0007486122317153
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "rust_core",
+      "n": 100000,
+      "median_s": 0.0033295245007138874,
+      "min_s": 0.003232129000025452,
+      "repeats": 50,
+      "estimate": 3.0007486122317153
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "numpy",
+      "n": 100000,
+      "median_s": 0.0017803775003812916,
+      "min_s": 0.0017631940008868696,
+      "repeats": 50,
+      "estimate": 3.0007486122317544
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "statsmodels",
+      "n": 100000,
+      "median_s": 0.006480832999841368,
+      "min_s": 0.006290498000453226,
+      "repeats": 50,
+      "estimate": 3.0007486122317557
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "rust_wrapper",
+      "n": 1000000,
+      "median_s": 0.12082569399990462,
+      "min_s": 0.11746596500051965,
+      "repeats": 17,
+      "estimate": 1.9968489585738516
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "rust_core",
+      "n": 1000000,
+      "median_s": 0.05905247100008637,
+      "min_s": 0.05820007900001656,
+      "repeats": 34,
+      "estimate": 1.9968489585738516
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "numpy",
+      "n": 1000000,
+      "median_s": 0.02583768499971484,
+      "min_s": 0.025388924999788287,
+      "repeats": 50,
+      "estimate": 1.9968489585738562
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "statsmodels",
+      "n": 1000000,
+      "median_s": 0.10903686999972706,
+      "min_s": 0.1069579220002197,
+      "repeats": 18,
+      "estimate": 1.996848958573859
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "rust_wrapper",
+      "n": 1000000,
+      "median_s": 0.11909622399980435,
+      "min_s": 0.1166581090001273,
+      "repeats": 17,
+      "estimate": 2.003784618189782
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "rust_core",
+      "n": 1000000,
+      "median_s": 0.04457324499981041,
+      "min_s": 0.043577184999776364,
+      "repeats": 45,
+      "estimate": 2.003784618189782
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "numpy",
+      "n": 1000000,
+      "median_s": 0.054425201000412926,
+      "min_s": 0.053854821000641095,
+      "repeats": 37,
+      "estimate": 2.0037846181878205
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "linearmodels",
+      "n": 1000000,
+      "median_s": 1.0792873059999692,
+      "min_s": 1.0608641259996148,
+      "repeats": 3,
+      "estimate": 2.0037846181878143
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "rust_wrapper",
+      "n": 1000000,
+      "median_s": 0.1296371965004255,
+      "min_s": 0.12565279000045848,
+      "repeats": 16,
+      "estimate": 2.9937907217014836
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "rust_core",
+      "n": 1000000,
+      "median_s": 0.07359924849970412,
+      "min_s": 0.0726484150000033,
+      "repeats": 28,
+      "estimate": 2.9937907217014836
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "numpy",
+      "n": 1000000,
+      "median_s": 0.048449764999986655,
+      "min_s": 0.04751885699988634,
+      "repeats": 42,
+      "estimate": 2.9937907217008934
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "statsmodels",
+      "n": 1000000,
+      "median_s": 0.12768925999989733,
+      "min_s": 0.12406821900003706,
+      "repeats": 16,
+      "estimate": 2.9937907217008903
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "rust_wrapper",
+      "n": 10000000,
+      "median_s": 1.3403889130004245,
+      "min_s": 1.3387233889998242,
+      "repeats": 3,
+      "estimate": 2.0003436588812895
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "rust_core",
+      "n": 10000000,
+      "median_s": 0.6468420495002647,
+      "min_s": 0.6437837909998052,
+      "repeats": 4,
+      "estimate": 2.0003436588812895
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "numpy",
+      "n": 10000000,
+      "median_s": 0.3141577509995841,
+      "min_s": 0.31308559399985825,
+      "repeats": 7,
+      "estimate": 2.000343658881243
+    },
+    {
+      "estimator": "OLS",
+      "implementation": "statsmodels",
+      "n": 10000000,
+      "median_s": 0.9936579109999002,
+      "min_s": 0.964032331999988,
+      "repeats": 3,
+      "estimate": 2.000343658881232
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "rust_wrapper",
+      "n": 10000000,
+      "median_s": 1.3697576929998831,
+      "min_s": 1.3484231080001337,
+      "repeats": 3,
+      "estimate": 1.999730213337985
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "rust_core",
+      "n": 10000000,
+      "median_s": 0.7017081210005927,
+      "min_s": 0.6962802839998403,
+      "repeats": 3,
+      "estimate": 1.999730213337985
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "numpy",
+      "n": 10000000,
+      "median_s": 0.5302773670000533,
+      "min_s": 0.5231948380005633,
+      "repeats": 4,
+      "estimate": 1.9997302133274062
+    },
+    {
+      "estimator": "IV/2SLS",
+      "implementation": "linearmodels",
+      "n": 10000000,
+      "median_s": 11.730324530999496,
+      "min_s": 11.622496781999871,
+      "repeats": 3,
+      "estimate": 1.9997302133273633
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "rust_wrapper",
+      "n": 10000000,
+      "median_s": 1.495599693999793,
+      "min_s": 1.491239535999739,
+      "repeats": 3,
+      "estimate": 2.9991473746249295
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "rust_core",
+      "n": 10000000,
+      "median_s": 0.9128096179993008,
+      "min_s": 0.8284340110003541,
+      "repeats": 3,
+      "estimate": 2.9991473746249295
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "numpy",
+      "n": 10000000,
+      "median_s": 0.46055551299923536,
+      "min_s": 0.45258547100002033,
+      "repeats": 5,
+      "estimate": 2.999147374626686
+    },
+    {
+      "estimator": "DiD",
+      "implementation": "statsmodels",
+      "n": 10000000,
+      "median_s": 1.190194841000448,
+      "min_s": 1.1706474430002345,
+      "repeats": 3,
+      "estimate": 2.9991473746266926
+    }
+  ]
+}

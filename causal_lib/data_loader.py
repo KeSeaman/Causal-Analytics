@@ -54,3 +54,42 @@ def preprocess_ihdp(df: pl.DataFrame) -> pl.DataFrame:
         df = df.with_columns(pl.col("outcome").cast(pl.Float64))
     
     return df
+
+
+NSW_URLS = {
+    1: "https://users.nber.org/~rdehejia/data/nsw_treated.txt",
+    0: "https://users.nber.org/~rdehejia/data/nsw_control.txt",
+}
+NSW_COLUMNS = ["treat", "age", "education", "black", "hispanic", "married", "nodegree", "re75", "re78"]
+
+
+def _read_nber_whitespace(source: str) -> pl.DataFrame:
+    """Dehejia's NSW files are whitespace-separated with no header."""
+    import io
+    import urllib.request
+
+    with urllib.request.urlopen(source, timeout=60) as resp:
+        raw = resp.read()
+    return (
+        pl.read_csv(io.BytesIO(raw), has_header=False, separator="|", new_columns=["raw"])
+        .select(pl.col("raw").str.extract_all(r"\S+").alias("parts"))
+        .select(pl.col("parts").list.get(i).cast(pl.Float64).alias(c) for i, c in enumerate(NSW_COLUMNS))
+    )
+
+
+def load_nsw(cache_dir: str = "data") -> pl.DataFrame:
+    """NSW experimental sample (Dehejia & Wahba): 297 treated + 425 control = 722 rows.
+
+    Downloads from NBER once and caches to ``<cache_dir>/nsw.csv``.
+    """
+    from pathlib import Path
+
+    cache = Path(cache_dir) / "nsw.csv"
+    if cache.exists():
+        return pl.read_csv(cache)
+    df = pl.concat([_read_nber_whitespace(url) for url in NSW_URLS.values()]).with_columns(
+        pl.col(c).cast(pl.Int64) for c in ["treat", "age", "education", "black", "hispanic", "married", "nodegree"]
+    )
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    df.write_csv(cache)
+    return df

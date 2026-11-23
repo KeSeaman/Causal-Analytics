@@ -25,3 +25,11 @@ gpu = ["scikit-learn-intelex>=2024.0"]
 features = ["pyo3/extension-module"]
 python-source = "python"
 module-name = "causal_rust_core._causal_rust_core"
+
+[dependency-groups]
+dev = [
+    "linearmodels>=7.1",
+    "maturin>=1.16.0",
+    "pytest>=9.2.0",
+    "statsmodels>=0.15.0",
+]
